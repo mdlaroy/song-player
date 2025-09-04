@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>sounds of life</title>
+<style>
+  :root{--bg:#251e38;--panel:#1c1127;--text:#eae6f3;--muted:#9fb1c3;--accent:#623fa3;--good:#7ee787;--border:#594a72}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial}
+  .wrap{max-width:600px;margin:28px auto;padding:0 16px}
+  h1{font-size:1.4rem;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:.95rem;margin-bottom:16px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:0 8px 24px rgba(99, 76, 141, 0.25);padding:14px}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  button{background:#2b2041;color:var(--text);border:1px solid #62567e;border-radius:10px;padding:8px 12px;cursor:pointer}
+  button[disabled]{opacity:.5;cursor:not-allowed}
+  audio{width:100%;margin:10px 0}
+  .meaning{display:none;margin-top:8px;padding:10px;border:1px solid var(--border);border-radius:10px;background:#0f0a16}
+  .hint{color:var(--muted);font-size:.9rem;margin-top:6px}
+  .now{color:var(--muted);font-size:.95rem;margin-top:2px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>sounds of life</h1>
+    <div class="sub">each track is something i consider an inside joke, funny, or related to us or moments in our friendship.
+        guess the songs, guess the meaning, or just listen along and reveal the meaning :>
+    </div>
+
+    <div class="card" id="player">
+      <div>
+        <div class="t" id="title">—</div>
+        <div class="now" id="status">press play</div>
+      </div>
+      <audio id="audio" preload="metadata" controls></audio>
+      <div class="row">
+        <button id="revealBtn" disabled>reveal hidden meaning</button>
+        <button id="nextTrack">next song ⏭</button>
+      </div>
+      <div class="meaning" id="meaning"></div>
+      <div class="hint" id="hint"></div>
+    </div>
+  </div>
+
+<script>
+
+const TRACKS = [
+  {
+    title: 'great artist (for you), terrible song (for me)',
+
+    src: 'safeinside.mp3',
+    meaning: 'how could i not include the iconic james arthur song that i can\'t listen to without cringing',
+    hint: '"i listen to this every time you drive home"',
+    revealAtSec: 20
+  },
+  {
+    title: 'no better chefs in the house than us',
+
+    src: 'jimmycooks.mp3',
+    meaning: 'summer of 2023, the era of the jimmy cooks era. an unparalleled time in rami and megan history. for better or maybe for worse?',
+    hint: 'spin the block twice, like there ain\'t nowhere to park',
+    revealAtSec: 20
+  },
+  {
+    title: 'i heard it\'s a good karaoke song',
+
+    src: 'scars.mp3',
+    meaning: 'the iconic abhi and rami duet song',
+    hint: 'it is played frequently in a certain person\'s car',
+    revealAtSec: 20
+  },
+  {
+    title: 'maybe when we are feeling a little toxic',
+
+    src: 'miss.mp3',
+    meaning: 'of course i had to throw in a tatiana song for us posessive gals',
+    hint: 'title is fitting for people like us',
+    revealAtSec: 20
+  },
+  {
+    title: 'could cause 20 grown men to get in their feels',
+
+    src: 'marvinsroom.mp3',
+    meaning: 'the universal 2am feelings and also an iconic song',
+    hint: 'do not play on speaker in public',
+    revealAtSec: 20
+  },
+  {
+    title: 'delulu',
+
+    src: 'nonsense.mp3',
+    meaning: 'there couldn\'t be a more fitting song for two of the most delulu people i know',
+    hint: 'peak fake scenarios in our head song',
+    revealAtSec: 20
+  },
+  {
+    title: 'wake up',
+
+    src: 'sevenyears.mp3',
+    meaning: 'iconic rami song, also a fun fact that i learned about you very early on',
+    hint: 'i heard it is a good song to hear first thing in the morning',
+    revealAtSec: 20
+  }
+];
+
+
+const audio = document.getElementById('audio');
+const titleEl = document.getElementById('title');
+const statusEl = document.getElementById('status');
+const meaningEl = document.getElementById('meaning');
+const hintEl = document.getElementById('hint');
+const revealBtn = document.getElementById('revealBtn');
+const nextBtn = document.getElementById('nextTrack');
+
+let index = 0;
+let unlocked = false;
+
+function load(autoplay=false){
+  const t = TRACKS[index];
+  titleEl.textContent = t.title;
+  audio.src = t.src || '';
+  statusEl.textContent = 'happy birthday';
+  meaningEl.style.display = 'none';
+  meaningEl.textContent = t.meaning || '';
+  hintEl.textContent = t.hint ? 'clue: ' + t.hint : '';
+  revealBtn.disabled = true;
+  unlocked = false;
+  if (autoplay) audio.play().catch(()=>{});
+}
+
+
+audio.addEventListener('timeupdate', () => {
+  const t = TRACKS[index];
+  const need = (t && t.revealAtSec) || 30;
+  if (!unlocked && audio.currentTime >= need){
+    unlocked = true;
+    revealBtn.disabled = false;
+  }
+});
+
+revealBtn.onclick = () => {
+  if (!unlocked) return;
+  const shown = meaningEl.style.display === 'block';
+  meaningEl.style.display = shown ? 'none' : 'block';
+};
+
+nextBtn.onclick = () => {
+  index = (index + 1) % TRACKS.length;
+  load(true);
+};
+
+
+audio.addEventListener('ended', () => {
+  index = (index + 1) % TRACKS.length;
+  load(true);
+});
+
+
+load(false);
+</script>
+</body>
+</html>
